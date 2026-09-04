@@ -1028,21 +1028,15 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
     try{
       var all=JSON.parse(localStorage.getItem(FT_KEY)||"{}");
       var saved=all[userId+"_"+selYear]||{};
-      var farms=(function(){
-        try{return JSON.parse(localStorage.getItem(FL_KEY)||"{}")[userId]||[];}catch(x){return[];}
-      })();
+      var farms=(function(){try{return JSON.parse(localStorage.getItem(FL_KEY)||"{}")[userId]||[];}catch(x){return[];}})();
       var keys=Object.keys(saved).filter(function(k){return !isNaN(k);});
       if(keys.length===0&&farms.length===0)return [];
       var len=Math.max(farms.length,keys.length);
       return Array.from({length:len},function(_,i){
         var farm=farms[i]||{};var row=saved[i]||{};
         return _objectSpread(_objectSpread({},row),{},{
-          farmName:farm.name||"—",
-          area:farm.area?Math.round(parseFloat(farm.area)*100):"—",
-          td1:row.td1!==undefined?row.td1:(row.ed||""),
-          tq1:row.tq1!==undefined?row.tq1:(row.eq||""),
-          tn1:row.tn1!==undefined?row.tn1:(row.en||""),
-          td2:row.td2||"", tq2:row.tq2||"", tn2:row.tn2||""
+          farmName:farm.name||row.farmName||"—",
+          area:farm.area?Math.round(parseFloat(farm.area)*100):row.area||"—"
         });
       });
     }catch(x){return[];}
@@ -1050,11 +1044,11 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 
   function downloadFert(user){
     var rows=getUserFert(user.id);
-    var headers=["농가명","면적(a)","밑거름 시비일","밑거름 시비량(20kg포)","밑거름 비료명","덧거름(1차) 시비일","덧거름(1차) 시비량(20kg포)","덧거름(1차) 비료명","덧거름(2차) 시비일","덧거름(2차) 시비량(20kg포)","덧거름(2차) 비료명"];
+    var headers=["농가명","면적(a)","밑거름 시비일","밑거름 시비량(kg)","밑거름 비료명","이삭거름 시비일","이삭거름 시비량(kg)","이삭거름 비료명"];
     var tbl="<table border='1' style='border-collapse:collapse;'>";
     tbl+="<tr>"+headers.map(function(h){return"<th style='padding:6px 10px;background:#92400e;color:white;'>"+h+"</th>";}).join("")+"</tr>";
     rows.forEach(function(r){
-      var cells=[r.farmName,r.area||"—",r.bd||"",r.bq||"",r.bn||"",r.td1||"",r.tq1||"",r.tn1||"",r.td2||"",r.tq2||"",r.tn2||""];
+      var cells=[r.farmName,r.area||"—",r.bd||"",r.bq||"",r.bn||"",r.ed||"",r.eq||"",r.en||""];
       tbl+="<tr>"+cells.map(function(c){return"<td style='padding:5px 8px;'>"+c+"</td>";}).join("")+"</tr>";
     });
     tbl+="</table>";
@@ -1296,25 +1290,20 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
       if(logs.length===0)return [];
       return logs.map(function(log){
         var farm=log.farmIdx!==""&&log.farmIdx!==undefined?farms[parseInt(log.farmIdx)]:null;
-        return{
-          date:log.date||"—",
-          farmName:farm?farm.name||"—":"—",
-          qty:log.qty||"—",
-          dryHours:log.dryHours?log.dryHours+"시간":"—",
-          inMoist:log.inMoist||"—",
-          outMoist:log.outMoist||"—"
-        };
+        var inT=(log.inH!==""&&log.inH!==undefined)?String(log.inH).padStart(2,"0")+":"+String(log.inM||0).padStart(2,"0"):"—";
+        var outT=(log.outH!==""&&log.outH!==undefined)?String(log.outH).padStart(2,"0")+":"+String(log.outM||0).padStart(2,"0"):"—";
+        return{date:log.date||"—",farmName:farm?farm.name||"—":"—",qty:log.qty||"—",inTime:inT,inMoist:log.inMoist||"—",outTime:outT,outMoist:log.outMoist||"—"};
       });
     }catch(x){return[];}
   }
 
   function downloadDryer(user){
     var rows=getUserDryer(user.id);
-    var headers=["작업일자","농가명","투입 톤백수","건조시간","투입전 수분(%)","배출시 수분(%)"];
+    var headers=["작업일자","농가명","투입량(kg)","투입시각","투입시 수분(%)","배출시각","배출시 수분(%)"];
     var tbl="<table border='1' style='border-collapse:collapse;'>";
     tbl+="<tr>"+headers.map(function(h){return"<th style='padding:6px 10px;background:#7c3aed;color:white;'>"+h+"</th>";}).join("")+"</tr>";
     rows.forEach(function(r){
-      tbl+="<tr>"+[r.date,r.farmName,r.qty,r.dryHours,r.inMoist,r.outMoist].map(function(c){return"<td style='padding:5px 8px;'>"+c+"</td>";}).join("")+"</tr>";
+      tbl+="<tr>"+[r.date,r.farmName,r.qty,r.inTime,r.inMoist,r.outTime,r.outMoist].map(function(c){return"<td style='padding:5px 8px;'>"+c+"</td>";}).join("")+"</tr>";
     });
     tbl+="</table>";
     var html2="<html><head><meta charset='utf-8'></head><body><h3>"+user.danjiName+" ("+user.chairName+") 건조기 작업 일지 "+selYear+"년</h3>"+tbl+"</body></html>";
@@ -1343,7 +1332,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
             React.createElement("table",{style:{borderCollapse:"collapse",minWidth:440}},
               React.createElement("thead",null,
                 React.createElement("tr",null,
-                  ["작업일자","농가명","투입 톤백수","건조시간","투입전 수분(%)","배출시 수분(%)"].map(function(h,hi){
+                  ["작업일자","농가명","투입량(kg)","투입시각","투입시 수분(%)","배출시각","배출시 수분(%)"].map(function(h,hi){
                     return React.createElement("th",{key:hi,style:{padding:"7px 4px",background:"#7c3aed",color:"white",fontWeight:900,fontSize:10,textAlign:"center",whiteSpace:"nowrap"}},h);
                   })
                 )
@@ -1352,7 +1341,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
                 getUserDryer(modalUser.id).map(function(row,ri){
                   var bg=ri%2===0?"white":"#f5f3ff";
                   return React.createElement("tr",{key:ri,style:{background:bg}},
-                    [row.date,row.farmName,row.qty,row.dryHours,row.inMoist,row.outMoist].map(function(c,ci){
+                    [row.date,row.farmName,row.qty,row.inTime||"—",row.inMoist,row.outTime||"—",row.outMoist].map(function(c,ci){
                       return React.createElement("td",{key:ci,style:{padding:"6px 4px",border:"1px solid #e5e7eb",fontSize:10,textAlign:"center"}},c);
                     })
                   );
