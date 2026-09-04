@@ -280,12 +280,21 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
       updateRow(ri,agentField,aboveVal);
     }
     return React.createElement("td",{style:cellSt},
-      React.createElement("input",{
-        type:"date",
-        value:row[dateField]||"",
-        onChange:function(ev){updateRow(ri,dateField,ev.target.value);},
-        style:{width:"100%",border:"1px solid #d1d5db",borderRadius:3,outline:"none",fontSize:"9.5px",background:"#fafafa",textAlign:"center",fontFamily:"inherit",display:"block",marginBottom:2,padding:"1px 0",boxSizing:"border-box"}
-      }),
+      React.createElement("div",{style:{position:"relative",width:"100%",marginBottom:2}},
+        React.createElement("input",{
+          type:"text",
+          readOnly:!0,
+          value:row[dateField]||"",
+          placeholder:"방제일자",
+          style:{width:"100%",border:"1px solid #d1d5db",borderRadius:3,outline:"none",fontSize:"9.5px",background:row[dateField]?"#ffffff":"#fafafa",textAlign:"center",fontFamily:"inherit",display:"block",padding:"1px 0",boxSizing:"border-box",cursor:"pointer",pointerEvents:"none"}
+        }),
+        React.createElement("input",{
+          type:"date",
+          value:row[dateField]||"",
+          onChange:function(ev){updateRow(ri,dateField,ev.target.value);},
+          style:{position:"absolute",top:0,left:0,width:"100%",height:"100%",opacity:0,cursor:"pointer",zIndex:2}
+        })
+      ),
       React.createElement("div",{style:{display:"flex",gap:2,marginBottom:2,justifyContent:"center"}},
         React.createElement("button",{
           onClick:function(){updateRow(ri,agentField,"");},
