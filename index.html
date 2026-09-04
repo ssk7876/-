@@ -235,6 +235,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
     try{return JSON.parse(localStorage.getItem(FL_KEY)||"{}")[cu.id]||[];}catch(x){return[];}
   })();
   var emptyRow=function(){return{date:"",farmIdx:"",qty:"",dryHours:"",inMoist:"",outMoist:""};};
+  var yrState=_slicedToArray(useState(Math.max((new Date).getFullYear(),2026)),2),selYear=yrState[0],setSelYear=yrState[1];
   var logsState=_slicedToArray(useState(function(){
     try{
       var saved=JSON.parse(localStorage.getItem(DK_KEY)||"{}")[cu.id+"_"+selYear]||[emptyRow()];
@@ -244,7 +245,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
     }catch(x){return[emptyRow()];}
   }),2);
   var logs=logsState[0],setLogs=logsState[1];
-  var svState=_slicedToArray(useState(!1),2),isSaved=svState[0],setSaved=svState[1];var yrState=_slicedToArray(useState(Math.max((new Date).getFullYear(),2026)),2),selYear=yrState[0],setSelYear=yrState[1];
+  var svState=_slicedToArray(useState(!1),2),isSaved=svState[0],setSaved=svState[1];
 
   function updateLog(i,field,val){
     setLogs(function(prev){
@@ -407,12 +408,13 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
   var farms=(function(){
     try{return JSON.parse(localStorage.getItem(FL_KEY)||"{}")[cu.id]||[]}catch(x){return[]}
   })();
+  var yrState=_slicedToArray(useState(Math.max((new Date).getFullYear(),2026)),2),selYear=yrState[0],setSelYear=yrState[1];
   var logsState=_slicedToArray(useState(function(){
     try{return JSON.parse(localStorage.getItem(CB_KEY)||"{}")[cu.id+"_"+selYear]||[{date:"",farmIdx:"",area:"",worker:""}];}
     catch(x){return[{date:"",farmIdx:"",area:"",worker:""}];}
   }),2);
   var logs=logsState[0],setLogs=logsState[1];
-  var svState=_slicedToArray(useState(!1),2),isSaved=svState[0],setSaved=svState[1];var yrState=_slicedToArray(useState(Math.max((new Date).getFullYear(),2026)),2),selYear=yrState[0],setSelYear=yrState[1];
+  var svState=_slicedToArray(useState(!1),2),isSaved=svState[0],setSaved=svState[1];
 
   function updateLog(i,field,val){
     setLogs(function(prev){
@@ -555,6 +557,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
   var farms=(function(){
     try{return JSON.parse(localStorage.getItem(FL_KEY)||"{}")[cu.id]||[]}catch(x){return[]}
   })();
+  var yrState=_slicedToArray(useState(Math.max((new Date).getFullYear(),2026)),2),selYear=yrState[0],setSelYear=yrState[1];
   var rowsState=_slicedToArray(useState(function(){
     try{
       var saved=JSON.parse(localStorage.getItem(FT_KEY)||"{}")[cu.id+"_"+selYear]||{};
@@ -575,7 +578,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
     }
   }),2);
   var rows=rowsState[0],setRows=rowsState[1];
-  var svState=_slicedToArray(useState(!1),2),isSaved=svState[0],setSaved=svState[1];var yrState=_slicedToArray(useState(Math.max((new Date).getFullYear(),2026)),2),selYear=yrState[0],setSelYear=yrState[1];
+  var svState=_slicedToArray(useState(!1),2),isSaved=svState[0],setSaved=svState[1];
 
   function updateRow(ri,field,val){
     setRows(function(prev){
@@ -761,6 +764,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
   var farms=(function(){
     try{return JSON.parse(localStorage.getItem(FL_KEY)||"{}")[cu.id]||[]}catch(x){return[]}
   })();
+  var yrState=_slicedToArray(useState(Math.max((new Date).getFullYear(),2026)),2),selYear=yrState[0],setSelYear=yrState[1];
   var rowsState=_slicedToArray(useState(function(){
     try{
       var saved=JSON.parse(localStorage.getItem(PL_KEY)||"{}")[cu.id+"_"+selYear]||{};
@@ -770,7 +774,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
     }
   }),2);
   var rows=rowsState[0],setRows=rowsState[1];
-  var svState=_slicedToArray(useState(!1),2),isSaved=svState[0],setSaved=svState[1];var yrState=_slicedToArray(useState(Math.max((new Date).getFullYear(),2026)),2),selYear=yrState[0],setSelYear=yrState[1];
+  var svState=_slicedToArray(useState(!1),2),isSaved=svState[0],setSaved=svState[1];
 
   function updateRow(ri,field,val){
     setRows(function(prev){
@@ -908,6 +912,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
       return JSON.parse(localStorage.getItem(FL_KEY) || "{}")[cu.id] || [];
     } catch(x) { return []; }
   })();
+  var yrState=_slicedToArray(useState(Math.max((new Date).getFullYear(),2026)),2),selYear=yrState[0],setSelYear=yrState[1];
   var rowsState = _slicedToArray(useState(function(){
     try {
       var saved = JSON.parse(localStorage.getItem(JN_KEY) || "{}")[cu.id+"_"+selYear] || {};
@@ -922,7 +927,6 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
   }), 2);
   var rows = rowsState[0], setRows = rowsState[1];
   var svState = _slicedToArray(useState(!1), 2), isSaved = svState[0], setSaved = svState[1];
-  var yrState = _slicedToArray(useState(Math.max((new Date).getFullYear(),2026)), 2), selYear = yrState[0], setSelYear = yrState[1];
 
   function updateRow(ri, field, val){
     setRows(function(prev){
