@@ -237,7 +237,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
   var emptyRow=function(){return{date:"",farmIdx:"",qty:"",dryHours:"",inMoist:"",outMoist:""};};
   var logsState=_slicedToArray(useState(function(){
     try{
-      var saved=JSON.parse(localStorage.getItem(DK_KEY)||"{}")[cu.id]||[emptyRow()];
+      var saved=JSON.parse(localStorage.getItem(DK_KEY)||"{}")[cu.id+"_"+selYear]||[emptyRow()];
       return saved.map(function(r){
         return _objectSpread(_objectSpread({},emptyRow()),r);
       });
@@ -262,10 +262,17 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
     setLogs(function(prev){return prev.filter(function(r,idx){return idx!==i;});});
   }
 
-  function saveAll(){
+  useEffect(function(){
+    try{
+      var saved=JSON.parse(localStorage.getItem(DK_KEY)||"{}")[cu.id+"_"+selYear]||[emptyRow()];
+      setLogs(saved.map(function(r){return _objectSpread({},emptyRow(),r);}));
+    }catch(x){}
+  },[selYear]);
+
+    function saveAll(){
     try{
       var stored=JSON.parse(localStorage.getItem(DK_KEY)||"{}");
-      stored[cu.id]=logs;
+      stored[cu.id+"_"+selYear]=logs;
       localStorage.setItem(DK_KEY,JSON.stringify(stored));
     }catch(x){}
     setSaved(!0);
@@ -401,7 +408,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
     try{return JSON.parse(localStorage.getItem(FL_KEY)||"{}")[cu.id]||[]}catch(x){return[]}
   })();
   var logsState=_slicedToArray(useState(function(){
-    try{return JSON.parse(localStorage.getItem(CB_KEY)||"{}")[cu.id]||[{date:"",farmIdx:"",area:"",worker:""}];}
+    try{return JSON.parse(localStorage.getItem(CB_KEY)||"{}")[cu.id+"_"+selYear]||[{date:"",farmIdx:"",area:"",worker:""}];}
     catch(x){return[{date:"",farmIdx:"",area:"",worker:""}];}
   }),2);
   var logs=logsState[0],setLogs=logsState[1];
@@ -427,10 +434,17 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
     });
   }
 
-  function saveAll(){
+  useEffect(function(){
+    try{
+      var saved=JSON.parse(localStorage.getItem(CB_KEY)||"{}")[cu.id+"_"+selYear]||[{date:"",farmIdx:"",area:"",worker:""}];
+      setLogs(saved);
+    }catch(x){}
+  },[selYear]);
+
+    function saveAll(){
     try{
       var stored=JSON.parse(localStorage.getItem(CB_KEY)||"{}");
-      stored[cu.id]=logs;
+      stored[cu.id+"_"+selYear]=logs;
       localStorage.setItem(CB_KEY,JSON.stringify(stored));
     }catch(x){}
     setSaved(!0);
@@ -543,7 +557,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
   })();
   var rowsState=_slicedToArray(useState(function(){
     try{
-      var saved=JSON.parse(localStorage.getItem(FT_KEY)||"{}")[cu.id]||{};
+      var saved=JSON.parse(localStorage.getItem(FT_KEY)||"{}")[cu.id+"_"+selYear]||{};
       return farms.map(function(f,i){
         var row=saved[i]||{};
         return {
@@ -586,12 +600,19 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
     });
   }
 
-  function saveAll(){
+  useEffect(function(){
+    try{
+      var saved=JSON.parse(localStorage.getItem(FT_KEY)||"{}")[cu.id+"_"+selYear]||{};
+      setRows(farms.map(function(f,i){return saved[i]||{bd:"",bq:"",bn:"",ed:"",eq:"",en:""};}));
+    }catch(x){}
+  },[selYear]);
+
+    function saveAll(){
     try{
       var stored=JSON.parse(localStorage.getItem(FT_KEY)||"{}");
       var data={};
       rows.forEach(function(row,i){data[i]=row;});
-      stored[cu.id]=data;
+      stored[cu.id+"_"+selYear]=data;
       localStorage.setItem(FT_KEY,JSON.stringify(stored));
     }catch(x){}
     setSaved(!0);
@@ -742,7 +763,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
   })();
   var rowsState=_slicedToArray(useState(function(){
     try{
-      var saved=JSON.parse(localStorage.getItem(PL_KEY)||"{}")[cu.id]||{};
+      var saved=JSON.parse(localStorage.getItem(PL_KEY)||"{}")[cu.id+"_"+selYear]||{};
       return farms.map(function(f,i){return saved[i]||{d1:"",a1:"",d2:"",a2:"",d3:"",a3:""};});
     }catch(x){
       return farms.map(function(){return{d1:"",a1:"",d2:"",a2:"",d3:"",a3:""};});
@@ -759,12 +780,19 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
     });
   }
 
-  function saveAll(){
+  useEffect(function(){
+    try{
+      var saved=JSON.parse(localStorage.getItem(PL_KEY)||"{}")[cu.id+"_"+selYear]||{};
+      setRows(farms.map(function(f,i){return saved[i]||{d1:"",a1:"",d2:"",a2:"",d3:"",a3:""};}));
+    }catch(x){}
+  },[selYear]);
+
+    function saveAll(){
     try{
       var stored=JSON.parse(localStorage.getItem(PL_KEY)||"{}");
       var data={};
       rows.forEach(function(row,i){data[i]=row;});
-      stored[cu.id]=data;
+      stored[cu.id+"_"+selYear]=data;
       localStorage.setItem(PL_KEY,JSON.stringify(stored));
     }catch(x){}
     setSaved(!0);
@@ -882,7 +910,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
   })();
   var rowsState = _slicedToArray(useState(function(){
     try {
-      var saved = JSON.parse(localStorage.getItem(JN_KEY) || "{}")[cu.id] || {};
+      var saved = JSON.parse(localStorage.getItem(JN_KEY) || "{}")[cu.id+"_"+selYear] || {};
       return farms.map(function(f, i){
         return saved[i] || { sowStart: "", sowEnd: "", transplantStart: "", transplantEnd: "", harvestStart: "", harvestEnd: "" };
       });
@@ -904,12 +932,19 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
     });
   }
 
-  function saveAll(){
+  useEffect(function(){
+    try{
+      var saved=JSON.parse(localStorage.getItem(JN_KEY)||"{}")[cu.id+"_"+selYear]||{};
+      setRows(farms.map(function(f,i){return saved[i]||{sowStart:"",sowEnd:"",transplantStart:"",transplantEnd:"",harvestStart:"",harvestEnd:""};}));
+    }catch(x){}
+  },[selYear]);
+
+    function saveAll(){
     try {
       var stored = JSON.parse(localStorage.getItem(JN_KEY) || "{}");
       var data = {};
       rows.forEach(function(row, i){ data[i] = row; });
-      stored[cu.id] = data;
+      stored[cu.id+"_"+selYear] = data;
       localStorage.setItem(JN_KEY, JSON.stringify(stored));
     } catch(x) {}
     setSaved(!0);
