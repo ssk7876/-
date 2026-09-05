@@ -285,6 +285,50 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
   var cellSt={padding:"3px 1px",border:"1px solid #e5e7eb",fontSize:10.5,textAlign:"center",background:"white",boxSizing:"border-box",verticalAlign:"middle"};
   var inpSt={width:"100%",border:"1px solid #d1d5db",borderRadius:4,padding:"3px 1px",fontSize:10.5,outline:"none",boxSizing:"border-box",textAlign:"center",fontFamily:"inherit"};
 
+  var qtyOptions=Array.from({length:30},function(_x,ix){return String(ix+1);});
+  var dryHoursOptions=Array.from({length:20},function(_x,ix){return String(ix+1);});
+  var inMoistOptions=Array.from({length:14},function(_x,ix){return String(ix+17);});
+  var outMoistOptions=Array.from({length:6},function(_x,ix){return String(ix+11);});
+
+  function numSelectCell(i,field,options){
+    var log=logs[i];
+    var raw=log[field];
+    var mode=log[field+"_mode"];
+    var isCustom=mode==="custom"||(raw!==""&&raw!==undefined&&options.indexOf(String(raw))===-1);
+    if(isCustom){
+      return React.createElement("div",{style:{display:"flex",gap:2,alignItems:"center"}},
+        React.createElement("input",{
+          value:raw||"",
+          onChange:function(ev){updateLog(i,field,ev.target.value);},
+          placeholder:"직접입력",
+          autoFocus:!0,
+          style:_objectSpread(_objectSpread({},inpSt),{},{flex:1,minWidth:0,margin:0})
+        }),
+        React.createElement("button",{
+          onClick:function(){updateLog(i,field+"_mode","select");updateLog(i,field,"");},
+          title:"목록선택으로 변경",
+          style:{fontSize:8.5,padding:"1px 2px",border:"1px solid #d1d5db",borderRadius:3,background:"#f3f4f6",color:"#374151",cursor:"pointer",flexShrink:0,lineHeight:1}
+        },"↩")
+      );
+    }
+    return React.createElement("select",{
+      value:options.indexOf(String(raw))!==-1?String(raw):"",
+      onChange:function(ev){
+        if(ev.target.value==="custom"){
+          updateLog(i,field+"_mode","custom");
+          updateLog(i,field,"");
+        } else {
+          updateLog(i,field,ev.target.value);
+        }
+      },
+      style:_objectSpread(_objectSpread({},inpSt),{},{background:"white",cursor:"pointer",padding:"2px 0",fontSize:10})
+    },
+      React.createElement("option",{value:""},"선택"),
+      options.map(function(o){return React.createElement("option",{key:o,value:o},o);}),
+      React.createElement("option",{value:"custom"},"직접 입력")
+    );
+  }
+
   return React.createElement("div",{style:{minHeight:"100vh",background:"#f9fafb",paddingBottom:90}},
     React.createElement("div",{style:{background:"#7c3aed",padding:"16px",display:"flex",alignItems:"center",justifyContent:"space-between"}},
       React.createElement("h1",{style:{color:"white",fontWeight:900,fontSize:18,margin:0}},"🌡 건조기 작업 일지"),
@@ -309,8 +353,8 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
               React.createElement("th",{style:headSt},"농가명"),
               React.createElement("th",{style:headSt},"투입\n톤백수"),
               React.createElement("th",{style:headSt},"건조\n시간"),
-              React.createElement("th",{style:headSt},"투입전\n수분(%)"),
-              React.createElement("th",{style:headSt},"배출시\n수분(%)"),
+              React.createElement("th",{style:_objectSpread(_objectSpread({},headSt),{},{whiteSpace:"normal"})},React.createElement("div",null,"투입전"),React.createElement("div",null,"수분(%)")),
+              React.createElement("th",{style:_objectSpread(_objectSpread({},headSt),{},{whiteSpace:"normal"})},React.createElement("div",null,"배출시"),React.createElement("div",null,"수분(%)")),
               React.createElement("th",{style:_objectSpread(_objectSpread({},headSt),{},{borderRight:"none"})},"")
             )
           ),
@@ -339,46 +383,16 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
                   )
                 ),
                 React.createElement("td",{style:_objectSpread(_objectSpread({},cellSt),{},{background:bg})},
-                  React.createElement("input",{
-                    type:"number",
-                    min:"0",
-                    step:"1",
-                    value:log.qty||"",
-                    onChange:function(ev){updateLog(i,"qty",ev.target.value);},
-                    placeholder:"톤백",
-                    style:inpSt
-                  })
+                  numSelectCell(i,"qty",qtyOptions)
                 ),
                 React.createElement("td",{style:_objectSpread(_objectSpread({},cellSt),{},{background:bg})},
-                  React.createElement("input",{
-                    type:"number",
-                    min:"0",
-                    step:"1",
-                    value:log.dryHours||"",
-                    onChange:function(ev){updateLog(i,"dryHours",ev.target.value);},
-                    placeholder:"시간",
-                    style:inpSt
-                  })
+                  numSelectCell(i,"dryHours",dryHoursOptions)
                 ),
                 React.createElement("td",{style:_objectSpread(_objectSpread({},cellSt),{},{background:bg})},
-                  React.createElement("input",{
-                    type:"number",
-                    step:"0.1",
-                    value:log.inMoist||"",
-                    onChange:function(ev){updateLog(i,"inMoist",ev.target.value);},
-                    placeholder:"%",
-                    style:inpSt
-                  })
+                  numSelectCell(i,"inMoist",inMoistOptions)
                 ),
                 React.createElement("td",{style:_objectSpread(_objectSpread({},cellSt),{},{background:bg})},
-                  React.createElement("input",{
-                    type:"number",
-                    step:"0.1",
-                    value:log.outMoist||"",
-                    onChange:function(ev){updateLog(i,"outMoist",ev.target.value);},
-                    placeholder:"%",
-                    style:inpSt
-                  })
+                  numSelectCell(i,"outMoist",outMoistOptions)
                 ),
                 React.createElement("td",{style:_objectSpread(_objectSpread({},cellSt),{},{background:bg})},
                   React.createElement("button",{
