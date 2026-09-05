@@ -553,7 +553,71 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
         style:{width:"100%",background:"#1e40af",color:"white",border:"none",borderRadius:12,padding:"14px 0",fontSize:15,fontWeight:900,cursor:"pointer",boxShadow:"0 4px 12px rgba(0,0,0,.15)"}},isSaved?"✅ 저장됨":"💾 저장")
     )
   );
-}function FertilizerScreen(e){
+}
+var FERT_BASE_LISTS={
+  "벼":["골드측조","단한번","반포로","신세대"],
+  "맥류":["nk비료","슈퍼원예","유기질비료"],
+  "콩":["nk비료","슈퍼원예","요소","유기질비료"]
+};
+function getFertBaseList(crop){
+  if(crop==="벼")return FERT_BASE_LISTS["벼"];
+  if(["보리","밀","트리티케일"].includes(crop))return FERT_BASE_LISTS["맥류"];
+  if(crop==="콩")return FERT_BASE_LISTS["콩"];
+  return[];
+}
+var FERT_TOP_LISTS={
+  "벼":["nk비료","규산","반포로","요소","파워드론"],
+  "맥류":["nk비료","슈퍼원예","유기질비료"],
+  "콩":["nk비료","슈퍼원예","요소","유기질비료"]
+};
+function getFertTopList(crop){
+  if(crop==="벼")return FERT_TOP_LISTS["벼"];
+  if(["보리","밀","트리티케일"].includes(crop))return FERT_TOP_LISTS["맥류"];
+  if(crop==="콩")return FERT_TOP_LISTS["콩"];
+  return[];
+}
+function FertNameCell(e){
+  var ri=e.ri,nameField=e.nameField,rows=e.rows,updateRow=e.updateRow,nameList=e.nameList,inpSt=e.inpSt;
+  var row=rows[ri]||{};
+  var val=row[nameField]||"";
+  var openState=_slicedToArray(useState(!1),2),open=openState[0],setOpen=openState[1];
+  var customState=_slicedToArray(useState(!1),2),isCustom=customState[0],setCustom=customState[1];
+  if(isCustom)return React.createElement("input",{
+    value:val,
+    onChange:function(ev){updateRow(ri,nameField,ev.target.value);},
+    placeholder:"비료명 직접입력",
+    autoFocus:!0,
+    style:_objectSpread(_objectSpread({},inpSt),{},{marginBottom:2})
+  });
+  return React.createElement("div",{style:{position:"relative",width:"100%",marginBottom:2}},
+    React.createElement("button",{
+      onClick:function(){setOpen(!0);},
+      style:_objectSpread(_objectSpread({},inpSt),{},{background:"white",cursor:"pointer",overflow:"hidden",whiteSpace:"nowrap",textOverflow:"ellipsis",color:val?"#111827":"#9ca3af"})
+    },val||"비료명 선택"),
+    open&&React.createElement(React.Fragment,null,
+      React.createElement("div",{style:{position:"fixed",inset:0,zIndex:200,background:"rgba(0,0,0,.35)"},onClick:function(){setOpen(!1);}}),
+      React.createElement("div",{style:{position:"fixed",top:"50%",left:"50%",transform:"translate(-50%,-50%)",zIndex:201,background:"white",border:"2px solid #92400e",borderRadius:18,maxHeight:"75vh",overflowY:"auto",width:"85vw",maxWidth:380,boxShadow:"0 8px 32px rgba(0,0,0,.28)"}},
+        React.createElement("div",{style:{padding:"16px 20px 12px",fontWeight:900,fontSize:16,color:"#92400e",borderBottom:"1px solid #e5e7eb",position:"sticky",top:0,background:"white"}},"비료명 선택"),
+        (nameList||[]).map(function(item){
+          return React.createElement("button",{
+            key:item,
+            onClick:function(){updateRow(ri,nameField,item);setOpen(!1);},
+            style:{width:"100%",textAlign:"left",padding:"16px 20px",fontSize:16,background:"none",border:"none",borderBottom:"1px solid #f3f4f6",cursor:"pointer",fontFamily:"inherit"},
+            onMouseOver:function(ev){ev.currentTarget.style.background="#fef3c7";},
+            onMouseOut:function(ev){ev.currentTarget.style.background="none";}
+          },item);
+        }),
+        React.createElement("button",{
+          onClick:function(){setCustom(!0);updateRow(ri,nameField,"");setOpen(!1);},
+          style:{width:"100%",textAlign:"left",padding:"16px 20px",fontSize:16,fontWeight:700,color:"#92400e",background:"none",border:"none",cursor:"pointer",fontFamily:"inherit"},
+          onMouseOver:function(ev){ev.currentTarget.style.background="#fef3c7";},
+          onMouseOut:function(ev){ev.currentTarget.style.background="none";}
+        },"직접입력")
+      )
+    )
+  );
+}
+function FertilizerScreen(e){
   var app=e.app,onBack=e.onBack,cu=app.currentUser;
   var FL_KEY="seedfarm_farmlist_v1",FT_KEY="seedfarm_fertilizer_v1";
   var farms=(function(){
@@ -638,8 +702,10 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
   };
 
   var standardQtys=["1","2","3","4","5","6","7","8","9","10"];
+  var fertBaseList=getFertBaseList(cu&&cu.crop);
+  var fertTopList=getFertTopList(cu&&cu.crop);
 
-  function groupCell(ri,dateField,qtyField,nameField){
+  function groupCell(ri,dateField,qtyField,nameField,nameList){
     var row=rows[ri]||{};
     var isFirst=ri===0;
     var currentQty=String(row[qtyField]||"");
@@ -697,12 +763,16 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
         }),
         React.createElement("option",{value:"custom"},"직접입력")
       ),
-      React.createElement("input",{
-        value:row[nameField]||"",
-        onChange:function(ev){updateRow(ri,nameField,ev.target.value);},
-        placeholder:"비료명",
-        style:_objectSpread(_objectSpread({},inpSt),{},{marginBottom:2})
-      }),
+      React.createElement(nameList?FertNameCell:"input",
+        nameList?
+        {ri:ri,nameField:nameField,rows:rows,updateRow:updateRow,nameList:nameList,inpSt:inpSt}
+        :{
+          value:row[nameField]||"",
+          onChange:function(ev){updateRow(ri,nameField,ev.target.value);},
+          placeholder:"비료명",
+          style:_objectSpread(_objectSpread({},inpSt),{},{marginBottom:2})
+        }
+      ),
       React.createElement("button",{
         onClick:function(){copyAbove(ri,[dateField,qtyField,nameField]);},
         disabled:isFirst,
@@ -748,9 +818,9 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
               return React.createElement("tr",{key:i,style:{background:bg}},
                 React.createElement("td",{style:_objectSpread(_objectSpread({},cellSt),{},{width:"50px",fontWeight:700,color:"#111827",position:"sticky",left:0,background:bg,zIndex:1,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}),title:farm.name||""},farm.name||"—"),
                 React.createElement("td",{style:_objectSpread(_objectSpread({},cellSt),{},{width:"38px",whiteSpace:"nowrap",fontSize:9.5})},area),
-                groupCell(i,"bd","bq","bn"),
-                groupCell(i,"td1","tq1","tn1"),
-                groupCell(i,"td2","tq2","tn2")
+                groupCell(i,"bd","bq","bn",fertBaseList),
+                groupCell(i,"td1","tq1","tn1",fertTopList),
+                groupCell(i,"td2","tq2","tn2",fertTopList)
               );
             })
           )
