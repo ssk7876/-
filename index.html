@@ -594,41 +594,40 @@ function FertNameCell(e){
   var ri=e.ri,nameField=e.nameField,rows=e.rows,updateRow=e.updateRow,nameList=e.nameList,inpSt=e.inpSt;
   var row=rows[ri]||{};
   var val=row[nameField]||"";
-  var openState=_slicedToArray(useState(!1),2),open=openState[0],setOpen=openState[1];
-  var customState=_slicedToArray(useState(!1),2),isCustom=customState[0],setCustom=customState[1];
-  if(isCustom)return React.createElement("input",{
-    value:val,
-    onChange:function(ev){updateRow(ri,nameField,ev.target.value);},
-    placeholder:"비료명 직접입력",
-    autoFocus:!0,
-    style:_objectSpread(_objectSpread({},inpSt),{},{marginBottom:2})
-  });
-  return React.createElement("div",{style:{position:"relative",width:"100%",marginBottom:2}},
+  var mode=row[nameField+"_mode"];
+  var isCustom=mode==="custom"||(val!==""&&(nameList||[]).indexOf(val)===-1);
+  if(isCustom)return React.createElement("div",{style:{display:"flex",gap:2,alignItems:"center",marginBottom:2}},
+    React.createElement("input",{
+      value:val,
+      onChange:function(ev){updateRow(ri,nameField,ev.target.value);},
+      placeholder:"비료명 직접입력",
+      autoFocus:!0,
+      style:_objectSpread(_objectSpread({},inpSt),{},{flex:1,minWidth:0,margin:0})
+    }),
     React.createElement("button",{
-      onClick:function(){setOpen(!0);},
-      style:_objectSpread(_objectSpread({},inpSt),{},{background:"white",cursor:"pointer",overflow:"hidden",whiteSpace:"nowrap",textOverflow:"ellipsis",color:val?"#111827":"#9ca3af"})
-    },val||"비료명 선택"),
-    open&&React.createElement(React.Fragment,null,
-      React.createElement("div",{style:{position:"fixed",inset:0,zIndex:200,background:"rgba(0,0,0,.35)"},onClick:function(){setOpen(!1);}}),
-      React.createElement("div",{style:{position:"fixed",top:"50%",left:"50%",transform:"translate(-50%,-50%)",zIndex:201,background:"white",border:"2px solid #92400e",borderRadius:18,maxHeight:"75vh",overflowY:"auto",width:"85vw",maxWidth:380,boxShadow:"0 8px 32px rgba(0,0,0,.28)"}},
-        React.createElement("div",{style:{padding:"16px 20px 12px",fontWeight:900,fontSize:16,color:"#92400e",borderBottom:"1px solid #e5e7eb",position:"sticky",top:0,background:"white"}},"비료명 선택"),
-        (nameList||[]).map(function(item){
-          return React.createElement("button",{
-            key:item,
-            onClick:function(){updateRow(ri,nameField,item);setOpen(!1);},
-            style:{width:"100%",textAlign:"left",padding:"16px 20px",fontSize:16,background:"none",border:"none",borderBottom:"1px solid #f3f4f6",cursor:"pointer",fontFamily:"inherit"},
-            onMouseOver:function(ev){ev.currentTarget.style.background="#fef3c7";},
-            onMouseOut:function(ev){ev.currentTarget.style.background="none";}
-          },item);
-        }),
-        React.createElement("button",{
-          onClick:function(){setCustom(!0);updateRow(ri,nameField,"");setOpen(!1);},
-          style:{width:"100%",textAlign:"left",padding:"16px 20px",fontSize:16,fontWeight:700,color:"#92400e",background:"none",border:"none",cursor:"pointer",fontFamily:"inherit"},
-          onMouseOver:function(ev){ev.currentTarget.style.background="#fef3c7";},
-          onMouseOut:function(ev){ev.currentTarget.style.background="none";}
-        },"직접입력")
-      )
-    )
+      onClick:function(){updateRow(ri,nameField+"_mode","select");updateRow(ri,nameField,"");},
+      title:"목록선택으로 변경",
+      style:{fontSize:8.5,padding:"1px 2px",border:"1px solid #d1d5db",borderRadius:3,background:"#f3f4f6",color:"#374151",cursor:"pointer",flexShrink:0,lineHeight:1}
+    },"↩")
+  );
+  return React.createElement("select",{
+    value:(nameList||[]).indexOf(val)!==-1?val:"",
+    onChange:function(ev){
+      if(ev.target.value==="custom"){
+        updateRow(ri,nameField+"_mode","custom");
+        updateRow(ri,nameField,"");
+      } else {
+        updateRow(ri,nameField+"_mode","select");
+        updateRow(ri,nameField,ev.target.value);
+      }
+    },
+    style:_objectSpread(_objectSpread({},inpSt),{},{marginBottom:2,background:"white",cursor:"pointer",padding:"1px 0"})
+  },
+    React.createElement("option",{value:""},"비료명 선택"),
+    (nameList||[]).map(function(item){
+      return React.createElement("option",{key:item,value:item},item);
+    }),
+    React.createElement("option",{value:"custom"},"직접입력")
   );
 }
 function FertilizerScreen(e){
@@ -709,8 +708,8 @@ function FertilizerScreen(e){
 
   var sameBtnSt=function(isFirst){
     return {
-      width:"100%",fontSize:"8.5px",padding:"2px 0",border:"1px solid #d1d5db",borderRadius:3,
-      background:isFirst?"white":"#6366f1",color:isFirst?"#9ca3af":"white",
+      width:"100%",fontSize:"8.5px",padding:"2px 0",border:"1px solid "+(isFirst?"#e5e7eb":"#c7d2fe"),borderRadius:3,
+      background:isFirst?"white":"#e0e7ff",color:isFirst?"#9ca3af":"#4338ca",
       cursor:isFirst?"not-allowed":"pointer",fontFamily:"inherit",opacity:isFirst?0.4:1,letterSpacing:"-0.5px",whiteSpace:"nowrap"
     };
   };
@@ -872,15 +871,16 @@ function PestAgentCell(e){
   var ri=e.ri,dateField=e.dateField,agentField=e.agentField,rows=e.rows,updateRow=e.updateRow,agentList=e.agentList,cellSt=e.cellSt;
   var row=rows[ri]||{};
   var agentVal=row[agentField]||"";
+  var agentMode=row[agentField+"_mode"];
   var isFirst=ri===0;
-  var openState=_slicedToArray(useState(!1),2),open=openState[0],setOpen=openState[1];
-  var customState=_slicedToArray(useState(!1),2),isCustom=customState[0],setCustom=customState[1];
+  var isCustom=agentVal!=="″"&&(agentMode==="custom"||(agentVal!==""&&(agentList||[]).indexOf(agentVal)===-1));
   function setSameAsAbove(){
     if(isFirst)return;
     var aboveRow=rows[ri-1]||{};
     var aboveVal=aboveRow[agentField]||"";
     updateRow(ri,dateField,(rows[ri-1]||{})[dateField]||"");
     updateRow(ri,agentField,aboveVal);
+    updateRow(ri,agentField+"_mode",aboveRow[agentField+"_mode"]||"select");
   }
   return React.createElement("td",{style:cellSt},
     React.createElement("div",{style:{position:"relative",width:"100%",marginBottom:2}},
@@ -900,39 +900,38 @@ function PestAgentCell(e){
     ),
     (function(){
       if(agentVal==="″")return React.createElement("div",{style:{fontSize:13,fontWeight:900,color:"#6366f1",textAlign:"center",lineHeight:"18px",marginBottom:2}},"″");
-      if(isCustom)return React.createElement("input",{
-        value:agentVal,
-        onChange:function(ev){updateRow(ri,agentField,ev.target.value);},
-        placeholder:"약제명 직접입력",
-        autoFocus:!0,
-        style:{width:"100%",border:"1px solid #16a34a",borderRadius:3,padding:"2px 1px",fontSize:"9.5px",outline:"none",boxSizing:"border-box",textAlign:"center",fontFamily:"inherit",marginBottom:2}
-      });
-      return React.createElement("div",{style:{position:"relative",width:"100%",marginBottom:2}},
+      if(isCustom)return React.createElement("div",{style:{display:"flex",gap:2,alignItems:"center",marginBottom:2}},
+        React.createElement("input",{
+          value:agentVal,
+          onChange:function(ev){updateRow(ri,agentField,ev.target.value);},
+          placeholder:"약제명 직접입력",
+          autoFocus:!0,
+          style:{flex:1,minWidth:0,border:"1px solid #16a34a",borderRadius:3,padding:"2px 1px",fontSize:"9.5px",outline:"none",boxSizing:"border-box",textAlign:"center",fontFamily:"inherit"}
+        }),
         React.createElement("button",{
-          onClick:function(){setOpen(!0);},
-          style:{width:"100%",border:"1px solid #d1d5db",borderRadius:3,padding:"2px 1px",fontSize:"9.5px",outline:"none",boxSizing:"border-box",textAlign:"center",fontFamily:"inherit",background:"white",cursor:"pointer",overflow:"hidden",whiteSpace:"nowrap",textOverflow:"ellipsis",color:agentVal?"#111827":"#9ca3af"}
-        },agentVal||"약제명 선택"),
-        open&&React.createElement(React.Fragment,null,
-          React.createElement("div",{style:{position:"fixed",inset:0,zIndex:200,background:"rgba(0,0,0,.35)"},onClick:function(){setOpen(!1);}}),
-          React.createElement("div",{style:{position:"fixed",top:"50%",left:"50%",transform:"translate(-50%,-50%)",zIndex:201,background:"white",border:"2px solid #15803d",borderRadius:18,maxHeight:"75vh",overflowY:"auto",width:"85vw",maxWidth:380,boxShadow:"0 8px 32px rgba(0,0,0,.28)"}},
-            React.createElement("div",{style:{padding:"16px 20px 12px",fontWeight:900,fontSize:16,color:"#15803d",borderBottom:"1px solid #e5e7eb",position:"sticky",top:0,background:"white"}},"약제 선택"),
-            (agentList||[]).map(function(item){
-              return React.createElement("button",{
-                key:item,
-                onClick:function(){updateRow(ri,agentField,item);setOpen(!1);},
-                style:{width:"100%",textAlign:"left",padding:"16px 20px",fontSize:16,background:"none",border:"none",borderBottom:"1px solid #f3f4f6",cursor:"pointer",fontFamily:"inherit"},
-                onMouseOver:function(ev){ev.currentTarget.style.background="#f0fdf4";},
-                onMouseOut:function(ev){ev.currentTarget.style.background="none";}
-              },item);
-            }),
-            React.createElement("button",{
-              onClick:function(){setCustom(!0);updateRow(ri,agentField,"");setOpen(!1);},
-              style:{width:"100%",textAlign:"left",padding:"16px 20px",fontSize:16,fontWeight:700,color:"#15803d",background:"none",border:"none",cursor:"pointer",fontFamily:"inherit"},
-              onMouseOver:function(ev){ev.currentTarget.style.background="#f0fdf4";},
-              onMouseOut:function(ev){ev.currentTarget.style.background="none";}
-            },"직접입력")
-          )
-        )
+          onClick:function(){updateRow(ri,agentField+"_mode","select");updateRow(ri,agentField,"");},
+          title:"목록선택으로 변경",
+          style:{fontSize:8.5,padding:"1px 2px",border:"1px solid #d1d5db",borderRadius:3,background:"#f3f4f6",color:"#374151",cursor:"pointer",flexShrink:0,lineHeight:1}
+        },"↩")
+      );
+      return React.createElement("select",{
+        value:(agentList||[]).indexOf(agentVal)!==-1?agentVal:"",
+        onChange:function(ev){
+          if(ev.target.value==="custom"){
+            updateRow(ri,agentField+"_mode","custom");
+            updateRow(ri,agentField,"");
+          } else {
+            updateRow(ri,agentField+"_mode","select");
+            updateRow(ri,agentField,ev.target.value);
+          }
+        },
+        style:{width:"100%",border:"1px solid #d1d5db",borderRadius:3,padding:"1px 0",fontSize:"9.5px",outline:"none",boxSizing:"border-box",textAlign:"center",fontFamily:"inherit",background:"white",cursor:"pointer",marginBottom:2}
+      },
+        React.createElement("option",{value:""},"약제명 선택"),
+        (agentList||[]).map(function(item){
+          return React.createElement("option",{key:item,value:item},item);
+        }),
+        React.createElement("option",{value:"custom"},"직접입력")
       );
     })(),
     React.createElement("div",{style:{display:"flex",gap:2,justifyContent:"center"}},
