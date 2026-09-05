@@ -938,7 +938,7 @@ function PestAgentCell(e){
       React.createElement("button",{
         onClick:setSameAsAbove,
         disabled:isFirst,
-        style:{flex:1,minWidth:0,fontSize:"8.5px",padding:"2px 0",border:"1px solid #d1d5db",borderRadius:3,background:!isFirst&&agentVal==="″"?"#6366f1":"white",color:!isFirst&&agentVal==="″"?"white":"#374151",cursor:isFirst?"not-allowed":"pointer",fontFamily:"inherit",opacity:isFirst?0.35:1,letterSpacing:"-0.5px",whiteSpace:"nowrap"}
+        style:{flex:1,minWidth:0,fontSize:"8.5px",padding:"2px 0",border:"1px solid "+(!isFirst&&agentVal==="″"?"#c7d2fe":"#d1d5db"),borderRadius:3,background:!isFirst&&agentVal==="″"?"#e0e7ff":"white",color:!isFirst&&agentVal==="″"?"#4338ca":"#374151",cursor:isFirst?"not-allowed":"pointer",fontFamily:"inherit",opacity:isFirst?0.35:1,letterSpacing:"-0.5px",whiteSpace:"nowrap"}
       },"위 동일")
     )
   );
