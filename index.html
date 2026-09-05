@@ -761,9 +761,108 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
       React.createElement("button",{onClick:saveAll,style:{width:"100%",background:"#92400e",color:"white",border:"none",borderRadius:12,padding:"14px 0",fontSize:15,fontWeight:900,cursor:"pointer",boxShadow:"0 4px 12px rgba(0,0,0,.15)"}},isSaved?"✅ 저장됨":"💾 저장")
     )
   );
-}function PestLogScreen(e){
+}
+var PEST_AGENT_LISTS={
+  "벼":["리전트","보금자리","살리미","수호자","쉴드론","안빌","온누리","청실홍실","청출어람","헬리건"],
+  "맥류":["전천후","캡탄","클릭","플레이"],
+  "콩":["단골","둥실","듀알골드","명타자","모스킬","싸이메트","알지오"]
+};
+function getPestAgentList(crop){
+  if(crop==="벼")return PEST_AGENT_LISTS["벼"];
+  if(["보리","밀","트리티케일"].includes(crop))return PEST_AGENT_LISTS["맥류"];
+  if(crop==="콩")return PEST_AGENT_LISTS["콩"];
+  return[];
+}
+var PEST_AGENT_LISTS_2={
+  "벼":["가스가민","공중전","빅애니","살리미","쉴드론","안빌","오호라","올크린","청실홍실","청출어람","헬리건"],
+  "맥류":["전천후","주렁","캡탄","클릭","플레이"],
+  "콩":["단골","둥실","듀알골드","명타자","모스킬","싸이메트","알지오"]
+};
+function getPestAgentList2(crop){
+  if(crop==="벼")return PEST_AGENT_LISTS_2["벼"];
+  if(["보리","밀","트리티케일"].includes(crop))return PEST_AGENT_LISTS_2["맥류"];
+  if(crop==="콩")return PEST_AGENT_LISTS_2["콩"];
+  return[];
+}
+function PestAgentCell(e){
+  var ri=e.ri,dateField=e.dateField,agentField=e.agentField,rows=e.rows,updateRow=e.updateRow,agentList=e.agentList,cellSt=e.cellSt;
+  var row=rows[ri]||{};
+  var agentVal=row[agentField]||"";
+  var isFirst=ri===0;
+  var openState=_slicedToArray(useState(!1),2),open=openState[0],setOpen=openState[1];
+  var customState=_slicedToArray(useState(!1),2),isCustom=customState[0],setCustom=customState[1];
+  function setSameAsAbove(){
+    if(isFirst)return;
+    var aboveRow=rows[ri-1]||{};
+    var aboveVal=aboveRow[agentField]||"";
+    updateRow(ri,dateField,(rows[ri-1]||{})[dateField]||"");
+    updateRow(ri,agentField,aboveVal);
+  }
+  return React.createElement("td",{style:cellSt},
+    React.createElement("div",{style:{position:"relative",width:"100%",marginBottom:2}},
+      React.createElement("input",{
+        type:"text",
+        readOnly:!0,
+        value:row[dateField]||"",
+        placeholder:"방제일자",
+        style:{width:"100%",border:"1px solid #d1d5db",borderRadius:3,outline:"none",fontSize:"9.5px",background:row[dateField]?"#ffffff":"#fafafa",textAlign:"center",fontFamily:"inherit",display:"block",padding:"1px 0",boxSizing:"border-box",cursor:"pointer",pointerEvents:"none"}
+      }),
+      React.createElement("input",{
+        type:"date",
+        value:row[dateField]||"",
+        onChange:function(ev){updateRow(ri,dateField,ev.target.value);},
+        style:{position:"absolute",top:0,left:0,width:"100%",height:"100%",opacity:0,cursor:"pointer",zIndex:2}
+      })
+    ),
+    React.createElement("div",{style:{display:"flex",gap:2,marginBottom:2,justifyContent:"center"}},
+      React.createElement("button",{
+        onClick:setSameAsAbove,
+        disabled:isFirst,
+        style:{flex:1,minWidth:0,fontSize:"8.5px",padding:"2px 0",border:"1px solid #d1d5db",borderRadius:3,background:!isFirst&&agentVal==="″"?"#6366f1":"white",color:!isFirst&&agentVal==="″"?"white":"#374151",cursor:isFirst?"not-allowed":"pointer",fontFamily:"inherit",opacity:isFirst?0.35:1,letterSpacing:"-0.5px",whiteSpace:"nowrap"}
+      },"위 동일")
+    ),
+    agentVal==="″"?React.createElement("div",{style:{fontSize:13,fontWeight:900,color:"#6366f1",textAlign:"center",lineHeight:"18px"}},"″"):
+    isCustom?React.createElement("input",{
+      value:agentVal,
+      onChange:function(ev){updateRow(ri,agentField,ev.target.value);},
+      placeholder:"약제명 직접입력",
+      autoFocus:!0,
+      style:{width:"100%",border:"1px solid #16a34a",borderRadius:3,padding:"2px 1px",fontSize:"9.5px",outline:"none",boxSizing:"border-box",textAlign:"center",fontFamily:"inherit"}
+    }):
+    React.createElement("div",{style:{position:"relative",width:"100%"}},
+      React.createElement("button",{
+        onClick:function(){setOpen(!0);},
+        style:{width:"100%",border:"1px solid #d1d5db",borderRadius:3,padding:"2px 1px",fontSize:"9.5px",outline:"none",boxSizing:"border-box",textAlign:"center",fontFamily:"inherit",background:"white",cursor:"pointer",overflow:"hidden",whiteSpace:"nowrap",textOverflow:"ellipsis",color:agentVal?"#111827":"#9ca3af"}
+      },agentVal||"약제명 선택"),
+      open&&React.createElement(React.Fragment,null,
+        React.createElement("div",{style:{position:"fixed",inset:0,zIndex:200,background:"rgba(0,0,0,.35)"},onClick:function(){setOpen(!1);}}),
+        React.createElement("div",{style:{position:"fixed",top:"50%",left:"50%",transform:"translate(-50%,-50%)",zIndex:201,background:"white",border:"2px solid #15803d",borderRadius:16,maxHeight:"60vh",overflowY:"auto",width:240,boxShadow:"0 8px 32px rgba(0,0,0,.28)"}},
+          React.createElement("div",{style:{padding:"12px 16px 8px",fontWeight:900,fontSize:13,color:"#15803d",borderBottom:"1px solid #e5e7eb",position:"sticky",top:0,background:"white"}},"약제 선택"),
+          (agentList||[]).map(function(item){
+            return React.createElement("button",{
+              key:item,
+              onClick:function(){updateRow(ri,agentField,item);setOpen(!1);},
+              style:{width:"100%",textAlign:"left",padding:"10px 16px",fontSize:13,background:"none",border:"none",borderBottom:"1px solid #f3f4f6",cursor:"pointer",fontFamily:"inherit"},
+              onMouseOver:function(ev){ev.currentTarget.style.background="#f0fdf4";},
+              onMouseOut:function(ev){ev.currentTarget.style.background="none";}
+            },item);
+          }),
+          React.createElement("button",{
+            onClick:function(){setCustom(!0);updateRow(ri,agentField,"");setOpen(!1);},
+            style:{width:"100%",textAlign:"left",padding:"10px 16px",fontSize:13,fontWeight:700,color:"#15803d",background:"none",border:"none",cursor:"pointer",fontFamily:"inherit"},
+            onMouseOver:function(ev){ev.currentTarget.style.background="#f0fdf4";},
+            onMouseOut:function(ev){ev.currentTarget.style.background="none";}
+          },"직접입력")
+        )
+      )
+    )
+  );
+}
+function PestLogScreen(e){
   var app=e.app,onBack=e.onBack,cu=app.currentUser;
   var FL_KEY="seedfarm_farmlist_v1",PL_KEY="seedfarm_pestlog_v1";
+  var pestAgentList=getPestAgentList(cu&&cu.crop);
+  var pestAgentList2=getPestAgentList2(cu&&cu.crop);
   var farms=(function(){
     try{return JSON.parse(localStorage.getItem(FL_KEY)||"{}")[cu.id]||[]}catch(x){return[]}
   })();
@@ -810,54 +909,6 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
   var headSt={padding:"6px 2px",background:"#15803d",color:"white",fontWeight:900,fontSize:10,textAlign:"center",whiteSpace:"nowrap",borderRight:"1px solid #166534"};
   var cellSt={padding:"3px 2px",border:"1px solid #e5e7eb",fontSize:10,textAlign:"center",background:"white",boxSizing:"border-box",verticalAlign:"middle"};
 
-  function agentCell(ri,dateField,agentField){
-    var row=rows[ri]||{};
-    var agentVal=row[agentField]||"";
-    var isFirst=ri===0;
-    function setSameAsAbove(){
-      if(isFirst)return;
-      var aboveRow=rows[ri-1]||{};
-      var aboveVal=aboveRow[agentField]||"";
-      updateRow(ri,dateField,(rows[ri-1]||{})[dateField]||"");
-      updateRow(ri,agentField,aboveVal);
-    }
-    return React.createElement("td",{style:cellSt},
-      React.createElement("div",{style:{position:"relative",width:"100%",marginBottom:2}},
-        React.createElement("input",{
-          type:"text",
-          readOnly:!0,
-          value:row[dateField]||"",
-          placeholder:"방제일자",
-          style:{width:"100%",border:"1px solid #d1d5db",borderRadius:3,outline:"none",fontSize:"9.5px",background:row[dateField]?"#ffffff":"#fafafa",textAlign:"center",fontFamily:"inherit",display:"block",padding:"1px 0",boxSizing:"border-box",cursor:"pointer",pointerEvents:"none"}
-        }),
-        React.createElement("input",{
-          type:"date",
-          value:row[dateField]||"",
-          onChange:function(ev){updateRow(ri,dateField,ev.target.value);},
-          style:{position:"absolute",top:0,left:0,width:"100%",height:"100%",opacity:0,cursor:"pointer",zIndex:2}
-        })
-      ),
-      React.createElement("div",{style:{display:"flex",gap:2,marginBottom:2,justifyContent:"center"}},
-        React.createElement("button",{
-          onClick:function(){updateRow(ri,agentField,"");},
-          style:{flex:1,minWidth:0,fontSize:"8.5px",padding:"2px 0",border:"1px solid #d1d5db",borderRadius:3,background:agentVal!=="″"?"#16a34a":"white",color:agentVal!=="″"?"white":"#374151",cursor:"pointer",fontFamily:"inherit",letterSpacing:"-0.5px",whiteSpace:"nowrap"}
-        },"직접"),
-        React.createElement("button",{
-          onClick:setSameAsAbove,
-          disabled:isFirst,
-          style:{flex:1,minWidth:0,fontSize:"8.5px",padding:"2px 0",border:"1px solid #d1d5db",borderRadius:3,background:!isFirst&&agentVal==="″"?"#6366f1":"white",color:!isFirst&&agentVal==="″"?"white":"#374151",cursor:isFirst?"not-allowed":"pointer",fontFamily:"inherit",opacity:isFirst?0.35:1,letterSpacing:"-0.5px",whiteSpace:"nowrap"}
-        },"위 동일")
-      ),
-      agentVal==="″"?React.createElement("div",{style:{fontSize:13,fontWeight:900,color:"#6366f1",textAlign:"center",lineHeight:"18px"}},"″"):
-      React.createElement("input",{
-        value:agentVal,
-        onChange:function(ev){updateRow(ri,agentField,ev.target.value);},
-        placeholder:"약제명",
-        style:{width:"100%",border:"1px solid #d1d5db",borderRadius:3,padding:"2px 1px",fontSize:"9.5px",outline:"none",boxSizing:"border-box",textAlign:"center",fontFamily:"inherit"}
-      })
-    );
-  }
-
   return React.createElement("div",{style:{minHeight:"100vh",background:"#f9fafb",paddingBottom:90}},
     React.createElement("div",{style:{background:"#15803d",padding:"16px",display:"flex",alignItems:"center",justifyContent:"space-between"}},
       React.createElement("h1",{style:{color:"white",fontWeight:900,fontSize:18,margin:0}},"🌿 병해충 방제 일지"),
@@ -895,9 +946,9 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
               return React.createElement("tr",{key:i,style:{background:bg}},
                 React.createElement("td",{style:_objectSpread(_objectSpread({},cellSt),{},{width:"50px",fontWeight:700,color:"#111827",position:"sticky",left:0,background:bg,zIndex:1,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}),title:farm.name||""},farm.name||"—"),
                 React.createElement("td",{style:_objectSpread(_objectSpread({},cellSt),{},{width:"38px",whiteSpace:"nowrap",fontSize:9.5})},area),
-                agentCell(i,"d1","a1"),
-                agentCell(i,"d2","a2"),
-                agentCell(i,"d3","a3")
+                React.createElement(PestAgentCell,{key:"a1",ri:i,dateField:"d1",agentField:"a1",rows:rows,updateRow:updateRow,agentList:pestAgentList,cellSt:cellSt}),
+                React.createElement(PestAgentCell,{key:"a2",ri:i,dateField:"d2",agentField:"a2",rows:rows,updateRow:updateRow,agentList:pestAgentList2,cellSt:cellSt}),
+                React.createElement(PestAgentCell,{key:"a3",ri:i,dateField:"d3",agentField:"a3",rows:rows,updateRow:updateRow,agentList:pestAgentList2,cellSt:cellSt})
               );
             })
           )
